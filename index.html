@@ -81,7 +81,7 @@
         telefone: '',
         exibirEmpresa: false,
         imprimir: false,
-        os: {cliente: {nome: 'CONSUMIDOR', endereco: 'aaaaaaaaaaaaa', email: 'bbbbbbbbbbbbbbbbbb', telefone: 'cccccccccccc'}, itens: []},
+        os: {cliente: {nome: 'CONSUMIDOR', endereco: 'aaaaaaaaaaaaa', email: 'bbbbbbbbbbbbbbbbbb', telefone: 'cccccccccccc', cpf_cnpj: ''}, itens: []},
         item: {descricao: 'item...', valor_unitario: 0.0, quantidade: 1, valor_total: 0.0},
         msg: '',
 
@@ -94,7 +94,7 @@
           this.os.itens.push({
             descricao: this.item.descricao,
             valor_unitario: this.item.valor_unitario,
-            quantidade: this.item.valor_unitario,
+            quantidade: this.item.quantidade,
             valor_total: this.item.valor_total,
           })
         },
@@ -130,6 +130,10 @@
         setTotal(e) {
           let soma = this.item.valor_unitario * this.item.quantidade
           this.item.valor_total = parseFloat(soma);
+        },
+
+        getRealMascara(i) {
+          return 'R$ ' + i;
         },
         
         genTotal() {
@@ -193,11 +197,14 @@
             <div class="col-6">
               Endereço: <input type="text" x-model="os.cliente.endereco" />
             </div>
-            <div class="col-6">
+            <div class="col-4">
               Email: <input type="text" x-model="os.cliente.email" />
             </div>
-            <div class="col-6">
+            <div class="col-4">
               Telefone: <input type="text" x-model="os.cliente.telefone" />
+            </div>
+            <div class="col-4">
+              CPF/CNPJ: <input type="text" x-model="os.cliente.cpf_cnpj" />
             </div>
           </div>
         </div>
@@ -254,7 +261,7 @@
                     <th>Descrição</th>
                     <th>Valor. Unitário R$</th>
                     <th>Quantidade.</th>
-                    <th>Valor Total R$</th>
+                    <th>Valor Total R$X</th>
                     <th>Ação</th>
                   </tr>
                 </thead>
@@ -263,9 +270,9 @@
                     <tr>
                       <td x-text="index + 1"></td>
                       <td x-text="i.descricao"></td>
-                      <td x-text="i.valor_unitario"></td>
+                      <td x-text="getRealMascara(i.valor_unitario)"></td>
                       <td x-text="i.quantidade"></td>
-                      <td x-text="i.valor_total"></td>
+                      <td x-text="getRealMascara(i.valor_total)"></td>
                       <td>
                         <a class="button error" @click="removerItem(index)"
                           >remover</a
@@ -277,7 +284,7 @@
                 <tfoot>
                   <tr>
                     <th id="total" colspan="4">Total :</th>
-                    <td x-html="genTotal"></td>
+                    <td x-html="getRealMascara(genTotal())"></td>
                   </tr>
                  </tfoot>
               </table>
@@ -310,6 +317,9 @@
           <p style="padding-left: 0.75rem">
             Telefone.: <span x-html="os.cliente.telefone"> </span>
           </p>
+          <p style="padding-left: 0.75rem">
+            CPF/CNPJ.: <span x-html="os.cliente.cpf_cnpj"> </span>
+          </p>
         </div>
         <hr />
         <div class="table_container">
@@ -328,16 +338,16 @@
                 <tr>
                   <td x-text="index + 1"></td>
                   <td x-text="i.descricao"></td>
-                  <td x-text="i.valor_unitario"></td>
+                  <td x-text="getRealMascara(i.valor_unitario)"></td>
                   <td x-text="i.quantidade"></td>
-                  <td x-text="i.valor_total"></td>
+                  <td x-text="getRealMascara(i.valor_total)"></td>
                 </tr>
               </template>
             </tbody>
             <tfoot>
               <tr>
                 <th id="total" colspan="4">Total :</th>
-                <td x-html="genTotal"></td>
+                <td x-html="getRealMascara(genTotal())"></td>
               </tr>
              </tfoot>
           </table>
