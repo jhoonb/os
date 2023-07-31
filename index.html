@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap");
+    </style>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+
+    <style>
+      html,
+      body {
+        font-family: "Inconsolata", monospace;
+      }
+
+      /* aqui */
+
+      .boostrap4_striped {
+        font-size: 1.4rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        text-align: left;
+        box-sizing: border-box;
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+      }
+
+      .boostrap4_striped thead th {
+        font-size: 1.4rem;
+        line-height: 1.5;
+        color: #212529;
+        border-collapse: collapse;
+        box-sizing: border-box;
+        text-align: inherit;
+        padding: 0.75rem;
+        border-top: 1px solid #dee2e6;
+        vertical-align: bottom;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      .boostrap4_striped td {
+        font-size: 1.4rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        text-align: left;
+        border-collapse: collapse;
+        box-sizing: border-box;
+        padding: 0.75rem;
+        vertical-align: top;
+        border-top: 1px solid #dee2e6;
+      }
+
+      .boostrap4_striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+      /* ----------- Non table related styles */
+
+      .table_container {
+        max-width: 80vw;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+    <title>BK Os</title>
+  </head>
+  <body>
+    <div
+      id="app"
+      x-init="getEmpresa"
+      x-data="{
+        empresa: '',
+        telefone: '',
+        exibirEmpresa: false,
+        imprimir: false,
+        os: {cliente: {nome: 'CONSUMIDOR', endereco: 'aaaaaaaaaaaaa', email: 'bbbbbbbbbbbbbbbbbb', telefone: 'cccccccccccc'}, itens: []},
+        item: {descricao: 'item...', valor_unitario: 0.0, quantidade: 1, valor_total: 0.0},
+        msg: '',
+
+        addItem() {
+          if(this.item.valor_total <= 0) {
+            this.msg = 'Valor zerado. Corrija.';
+            return;
+          }
+          this.msg = '';
+          this.os.itens.push({
+            descricao: this.item.descricao,
+            valor_unitario: this.item.valor_unitario,
+            quantidade: this.item.valor_unitario,
+            valor_total: this.item.valor_total,
+          })
+        },
+
+        getEmpresa() {
+          let v = JSON.parse(localStorage.getItem('os_empresa'));
+          if(v == null || v == undefined) {
+            this.empresa = 'SEM EMPRESA';
+            this.exibirEmpresa = true;
+            return;
+          }
+          this.empresa = v.empresa;
+          this.telefone = v.telefone;
+          this.exibirEmpresa = false;
+        },
+
+        salvarEmpresa() {
+          let v = this.empresa;
+          let t = this.telefone;
+          if(v != null && v != undefined && v.length > 0 ){
+            console.log('entrou')
+            localStorage.setItem('os_empresa',JSON.stringify({
+              empresa: v, telefone: t
+            }));
+            this.exibirEmpresa = false;
+          }
+        },
+        
+        removerItem(i) {
+          this.os.itens.splice(i, 1);
+        },
+        
+        setTotal(e) {
+          let soma = this.item.valor_unitario * this.item.quantidade
+          this.item.valor_total = parseFloat(soma);
+        },
+        
+        genTotal() {
+          let soma = 0;
+          for(let i = 0; i < this.os.itens.length; i++) {
+            if(this.os.itens[i].valor_total != null || this.os.itens[i].valor_total != undefined) {
+              soma += this.os.itens[i].valor_total;
+            }
+            }
+            return parseFloat(soma.toFixed(2));
+          },
+          
+          temValor() {
+            console.log(this.genTotal());
+            return this.genTotal() > 0 ? true : false;
+          },
+          
+          acaoImprimir() {
+            this.imprimir = true;
+          },
+        }"
+    >
+      <div x-show="!imprimir">
+        <h4>
+          <p style="text-align: center"><b>Ordem de Serviço </b></p>
+        </h4>
+
+        <h6>
+          <p style="text-align: center">
+            <b x-html="empresa"></b> - <b x-html="telefone"></b>
+            <a @click="() => exibirEmpresa = true"> Trocar</a>
+          </p>
+        </h6>
+        <div class="row" x-show="exibirEmpresa">
+          <div class="col-4">
+            <input
+              type="text"
+              placeholder="digite o nome da empresa"
+              x-model="empresa"
+            />
+          </div>
+          <div class="col-2">
+            <input
+              type="text"
+              placeholder="digite o telefone"
+              x-model="telefone"
+            />
+          </div>
+          <div class="col-2">
+            <a class="button" @click="salvarEmpresa"> salvar</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="col-12">
+              <h5><b>Preencha abaixo os dados do cliente:</b></h5>
+            </div>
+            <div class="col-6">
+              Cliente: <input type="text" x-model="os.cliente.nome" />
+            </div>
+            <div class="col-6">
+              Endereço: <input type="text" x-model="os.cliente.endereco" />
+            </div>
+            <div class="col-6">
+              Email: <input type="text" x-model="os.cliente.email" />
+            </div>
+            <div class="col-6">
+              Telefone: <input type="text" x-model="os.cliente.telefone" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <div class="col-12"><h5>Insira abaixo os serviços:</h5></div>
+            <div class="col-5">
+              Descrição: <input type="text" x-model="item.descricao" />
+            </div>
+            <div class="col-2">
+              R$ Un.:
+              <input
+                type="number"
+                x-model="item.valor_unitario"
+                x-on:change="setTotal($event)"
+              />
+            </div>
+            <div class="col-1">
+              Qnt.:
+              <input
+                type="number"
+                x-model="item.quantidade"
+                step="1"
+                min="1"
+                x-on:change="setTotal($event)"
+              />
+            </div>
+            <div class="col-2">
+              R$: <input type="number" x-model="item.valor_total" readonly />
+            </div>
+            <div class="col-1">
+              Ação <a class="button primary" @click="addItem">Adicionar</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <div class="col-12">
+              <h5>
+                Serviços Lançados. Total R$
+                <span style="color: blue" x-text="genTotal"></span>
+              </h5>
+            </div>
+            <div class="col-12">
+              <span style="color: red" x-text="msg"></span>
+            </div>
+            <div class="col-12 table_container">
+              <table class="boostrap4_striped">
+                <thead>
+                  <tr>
+                    <th>Cód.</th>
+                    <th>Descrição</th>
+                    <th>Valor. Unitário R$</th>
+                    <th>Quantidade.</th>
+                    <th>Valor Total R$</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="(i, index) in os.itens">
+                    <tr>
+                      <td x-text="index + 1"></td>
+                      <td x-text="i.descricao"></td>
+                      <td x-text="i.valor_unitario"></td>
+                      <td x-text="i.quantidade"></td>
+                      <td x-text="i.valor_total"></td>
+                      <td>
+                        <a class="button error" @click="removerItem(index)"
+                          >remover</a
+                        >
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th id="total" colspan="4">Total :</th>
+                    <td x-html="genTotal"></td>
+                  </tr>
+                 </tfoot>
+              </table>
+            </div>
+            <div class="col-12">
+              <a class="button success" @click="acaoImprimir">GERAR OS</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div x-show="imprimir" class="table_container">
+        <p>
+          <a @click="()=> window.print()"> &#128438; </a>
+          <a @click="()=> imprimir = false"> &#8592;</a>
+        </p>
+        <div style="color: #212529; box-sizing: border-box; border-top: 1px solid #dee2e6;">
+          <h4 style="text-align: center">
+            <span x-html="empresa"> </span> - <span x-html="telefone"> </span>
+          </h4>
+          <p style="padding-left: 0.75rem">
+            Cliente..: <span x-html="os.cliente.nome"> </span>
+          </p>
+          <p style="padding-left: 0.75rem">
+            Endereço.: <span x-html="os.cliente.endereco"> </span>
+          </p>
+          <p style="padding-left: 0.75rem">
+            Email....: <span x-html="os.cliente.email"> </span>
+          </p>
+          <p style="padding-left: 0.75rem">
+            Telefone.: <span x-html="os.cliente.telefone"> </span>
+          </p>
+        </div>
+        <hr />
+        <div class="table_container">
+          <table class="boostrap4_striped">
+            <thead>
+              <tr>
+                <th>Cód.</th>
+                <th>Descrição</th>
+                <th>Valor. Unitário R$</th>
+                <th>Quantidade.</th>
+                <th>Valor Total R$</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(i, index) in os.itens">
+                <tr>
+                  <td x-text="index + 1"></td>
+                  <td x-text="i.descricao"></td>
+                  <td x-text="i.valor_unitario"></td>
+                  <td x-text="i.quantidade"></td>
+                  <td x-text="i.valor_total"></td>
+                </tr>
+              </template>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th id="total" colspan="4">Total :</th>
+                <td x-html="genTotal"></td>
+              </tr>
+             </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
